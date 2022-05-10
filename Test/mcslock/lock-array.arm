@@ -148,6 +148,7 @@ level L2 using MCSLock {
       readTail := compare_and_swap(tail, $me, 0);
       ghost_tail := if readTail == $me then 0 else ghost_tail;
       Q ::= if readTail == $me then [] else Q;
+      Q_pos ::= if readTail == $me then map[] else Q_pos;
     }
     if readTail != $me {
       while (locks[$me].next == 0) {}
@@ -155,6 +156,7 @@ level L2 using MCSLock {
       nextLock := locks[$me].next;
       atomic {
         Q, old_owner ::= if |Q| == 0 then [] else Q[1..], $me;
+        Q_pos ::= if |Q| == 0 then map[] else map i | i in Q_pos && i != $me :: Q_pos[i]-1;
         locks[nextLock].wait := 0;
       }
     }
@@ -215,6 +217,7 @@ level L3 using MCSLock {
       readTail := compare_and_swap(ghost_tail, $me, 0);
       tail ::= if readTail == $me then 0 else tail;
       Q ::= if readTail == $me then [] else Q;
+      Q_pos ::= if readTail == $me then map[] else Q_pos;
     }
     if readTail != $me {
       while (locks[$me].next == 0) {}
@@ -222,6 +225,7 @@ level L3 using MCSLock {
       nextLock := locks[$me].next;
       atomic {
         Q, old_owner ::= if |Q| == 0 then [] else Q[1..], $me;
+        Q_pos ::= if |Q| == 0 then map[] else map i | i in Q_pos && i != $me :: Q_pos[i]-1;
         locks[nextLock].wait := 0;
       }
     }
@@ -279,6 +283,7 @@ level L4 using MCSLock {
     atomic {
       readTail := compare_and_swap(ghost_tail, $me, 0);
       Q ::= if readTail == $me then [] else Q;
+      Q_pos ::= if readTail == $me then map[] else Q_pos;
     }
     if readTail != $me {
       while (locks[$me].next == 0) {}
@@ -286,6 +291,7 @@ level L4 using MCSLock {
       nextLock := locks[$me].next;
       atomic {
         Q, old_owner ::= if |Q| == 0 then [] else Q[1..], $me;
+        Q_pos ::= if |Q| == 0 then map[] else map i | i in Q_pos && i != $me :: Q_pos[i]-1;
         locks[nextLock].wait := 0;
       }
     }
@@ -353,6 +359,7 @@ level L5 using MCSLock {
     atomic {
       readTail := compare_and_swap(ghost_tail, $me, 0);
       Q ::= if readTail == $me then [] else Q;
+      Q_pos ::= if readTail == $me then map[] else Q_pos;
     }
     if readTail != $me {
       while (locks[$me].next == 0)
@@ -362,6 +369,7 @@ level L5 using MCSLock {
       assume |Q| > 0 && Q[0] == $me;
       atomic {
         Q, old_owner ::= if |Q| == 0 then [] else Q[1..], $me;
+        Q_pos ::= if |Q| == 0 then map[] else map i | i in Q_pos && i != $me :: Q_pos[i]-1;
         locks[nextLock].wait := 0;
       }
     }
@@ -436,6 +444,7 @@ level L6 using MCSLock {
     atomic {
       readTail := compare_and_swap(ghost_tail, $me, 0);
       Q ::= if readTail == $me then [] else Q;
+      Q_pos ::= if readTail == $me then map[] else Q_pos;
     }
     if readTail != $me {
       while (locks[$me].next == 0)
@@ -446,6 +455,7 @@ level L6 using MCSLock {
       atomic {
         Q, old_owner ::= if |Q| == 0 then [] else Q[1..], $me;
         // Q ::= if |Q| == 0 then [] else Q[1..];
+        Q_pos ::= if |Q| == 0 then map[] else map i | i in Q_pos && i != $me :: Q_pos[i]-1;
         locks[nextLock].wait := 0;
       }
     }

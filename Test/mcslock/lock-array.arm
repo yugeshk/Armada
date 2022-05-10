@@ -120,6 +120,7 @@ level L2 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
+  ghost var Q_pos: seq<(uint64, uint64)> := [];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64) {
     noaddr var prev: uint64 := 0;
@@ -129,6 +130,7 @@ level L2 using MCSLock {
       prev := atomic_exchange(tail, $me);
       ghost_tail := $me;
       Q ::= Q + [$me];
+      Q_pos ::= Q_pos + [($me, |Q|)];
     }
 
     if prev != 0 {
@@ -185,6 +187,7 @@ level L3 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
+  ghost var Q_pos: seq<(uint64, uint64)> := [];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64) {
     noaddr var prev: uint64 := 0;
@@ -249,6 +252,7 @@ level L4 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
+  ghost var Q_pos: seq<(uint64, uint64)> := [];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64) {
     noaddr var prev: uint64 := 0;
@@ -311,6 +315,7 @@ level L5 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
+  ghost var Q_pos: seq<(uint64, uint64)> := [];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64)
     requires $me !in Q
@@ -392,6 +397,7 @@ level L6 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
+  ghost var Q_pos: seq<(uint64, uint64)> := [];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64)
     requires $me !in Q
@@ -488,7 +494,7 @@ proof pseudo_impl_L1 {
 
 proof L1_L2 {
   refinement L1 L2
-  var_intro Q, ghost_tail, old_owner, placeholder
+  var_intro Q, Q_pos, ghost_tail, old_owner, placeholder
 }
 
 proof L2_L3 {

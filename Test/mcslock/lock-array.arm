@@ -120,7 +120,7 @@ level L2 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
-  ghost var Q_pos: seq<(uint64, uint64)> := [];
+  ghost var Q_pos: map<uint64, int> := map[];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64) {
     noaddr var prev: uint64 := 0;
@@ -130,7 +130,7 @@ level L2 using MCSLock {
       prev := atomic_exchange(tail, $me);
       ghost_tail := $me;
       Q ::= Q + [$me];
-      Q_pos ::= Q_pos + [($me, |Q|)];
+      Q_pos ::= Q_pos[$me := |Q|];
     }
 
     if prev != 0 {
@@ -187,7 +187,7 @@ level L3 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
-  ghost var Q_pos: seq<(uint64, uint64)> := [];
+  ghost var Q_pos: map<uint64, int> := map[];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64) {
     noaddr var prev: uint64 := 0;
@@ -197,6 +197,7 @@ level L3 using MCSLock {
       prev := atomic_exchange(ghost_tail, $me);
       tail ::= $me;
       Q ::= Q + [$me];
+      Q_pos ::= Q_pos[$me := |Q|];
     }
 
     if prev != 0 {
@@ -252,7 +253,7 @@ level L4 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
-  ghost var Q_pos: seq<(uint64, uint64)> := [];
+  ghost var Q_pos: map<uint64, int> := map[];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64) {
     noaddr var prev: uint64 := 0;
@@ -261,6 +262,7 @@ level L4 using MCSLock {
     atomic {
       prev := atomic_exchange(ghost_tail, $me);
       Q ::= Q + [$me];
+      Q_pos ::= Q_pos[$me := |Q|];
     }
 
     if prev != 0 {
@@ -315,7 +317,7 @@ level L5 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
-  ghost var Q_pos: seq<(uint64, uint64)> := [];
+  ghost var Q_pos: map<uint64, int> := map[];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64)
     requires $me !in Q
@@ -328,6 +330,7 @@ level L5 using MCSLock {
     atomic {
       prev := atomic_exchange(ghost_tail, $me);
       Q ::= Q + [$me];
+      Q_pos ::= Q_pos[$me := |Q|];
     }
 
     if prev != 0 {
@@ -397,7 +400,7 @@ level L6 using MCSLock {
   ghost var ghost_tail: uint64 := 0;
   ghost var old_owner: uint64 := 0;
   ghost var Q: seq<uint64> := [];
-  ghost var Q_pos: seq<(uint64, uint64)> := [];
+  ghost var Q_pos: map<uint64, int> := map[];
   ghost var placeholder: uint64 := 0;
   method acquire(myLock: uint64)
     requires $me !in Q
@@ -410,6 +413,7 @@ level L6 using MCSLock {
     atomic {
       prev := atomic_exchange(ghost_tail, $me);
       Q ::= Q + [$me];
+      Q_pos ::= Q_pos[$me := |Q|];
     }
 
     if prev != 0 {
